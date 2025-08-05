@@ -1,3 +1,4 @@
+#%%
 # LangChain Web Loader Example
 # This example demonstrates how to use LangChain to load websites and extract HTML content
 
@@ -203,3 +204,6 @@ if __name__ == "__main__":
 
 print("\nTo use this code, make sure you have installed:")
 print("pip install langchain langchain-community beautifulsoup4 requests")
+#%%
+
+# %%
