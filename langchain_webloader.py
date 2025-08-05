@@ -227,6 +227,3 @@ if __name__ == "__main__":
     # print("\n=== Advanced Web Loading ===")
     # advanced_docs = load_website_advanced(test_url, css_selector="p")
 
-# Installation requirements:
-# pip install langchain langchain-community beautifulsoup4 requests
-# %%
