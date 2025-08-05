@@ -1,3 +1,4 @@
+#%%
 # LangChain Web Loader Example
 # This example demonstrates how to use LangChain to load websites and extract HTML content
 
@@ -5,6 +6,13 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from bs4 import BeautifulSoup
 import requests
+from tenacity import retry, stop_after_attempt, wait_exponential
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 # Basic Web Loader Example
 def load_website_basic(url):
@@ -153,53 +161,72 @@ def load_and_split_website(url, chunk_size=1000, chunk_overlap=200):
         print(f"Error loading and splitting website: {e}")
         return None
 
-# Raw HTML Extraction
-def get_raw_html(url):
+# Raw HTML Extraction with timeout and retry logic
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def get_raw_html(url, timeout=10):
     """
-    Get raw HTML content from a URL
+    Get raw HTML content from a URL with timeout and retry logic
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=timeout)
         response.raise_for_status()
-        
+
         print(f"Successfully fetched HTML from {url}")
         print(f"Content length: {len(response.content)} bytes")
         print(f"Content type: {response.headers.get('content-type', 'unknown')}")
-        
+
         return response.text
-        
+
+    except requests.exceptions.Timeout:
+        print(f"Timeout error fetching raw HTML from {url}")
+        return None
     except Exception as e:
         print(f"Error fetching raw HTML: {e}")
+        return None
+
+# Raw HTML Extraction with Selenium for JavaScript-heavy websites
+def get_raw_html_with_selenium(url, timeout=30, wait_for_xpath=None):
+    """
+    Get raw HTML content from a JavaScript-heavy website using Selenium
+    """
+    try:
+        # Set up headless Chrome browser
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(options=chrome_options)
+
+        # Load the page
+        driver.get(url)
+
+        # Fixed delay to wait for content to load
+        time.sleep(10)
+
+        # Extract the page source
+        page_source = driver.page_source
+
+        print(f"Successfully fetched HTML from {url} using Selenium")
+        print(f"Content length: {len(page_source)} characters")
+
+        driver.quit()
+        return page_source
+
+    except Exception as e:
+        print(f"Error fetching raw HTML with Selenium: {e}")
         return None
 
 # Example usage
 if __name__ == "__main__":
     # Example URLs
-    test_url = "https://docs.python.org/3/tutorial/introduction.html"
-    test_urls = [
-        "https://docs.python.org/3/tutorial/introduction.html",
-        "https://docs.python.org/3/tutorial/controlflow.html"
-    ]
-    
+    test_url = "https://virtual.oxfordabstracts.com/event/75166/session/167646"
+
     print("=== Basic Web Loading ===")
-    docs = load_website_basic(test_url)
-    
-    print("\n=== Advanced Web Loading ===")
-    advanced_docs = load_website_advanced(test_url, css_selector="p")
-    
-    print("\n=== Multiple URLs Loading ===")
-    multi_docs = load_multiple_websites(test_urls)
-    
-    print("\n=== Load and Split for RAG ===")
-    split_docs = load_and_split_website(test_url, chunk_size=500, chunk_overlap=50)
-    
-    print("\n=== Raw HTML Extraction ===")
-    raw_html = get_raw_html(test_url)
-    if raw_html:
-        print(f"Raw HTML preview: {raw_html[:200]}...")
+    docs = get_raw_html_with_selenium(test_url, wait_for_xpath="//div[@style='display: grid;']")
+
+    # print("\n=== Advanced Web Loading ===")
+    # advanced_docs = load_website_advanced(test_url, css_selector="p")
 
 # Installation requirements:
 # pip install langchain langchain-community beautifulsoup4 requests
-
-print("\nTo use this code, make sure you have installed:")
-print("pip install langchain langchain-community beautifulsoup4 requests")
+# %%
