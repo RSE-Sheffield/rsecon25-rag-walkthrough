@@ -8,3 +8,5 @@ sentence-transformers
 pypdf2
 python-dotenv
 bs4
+pypdf
+langchain-chroma
