@@ -64,8 +64,6 @@ def plot_triangular_similarity_heatmap(similarity_matrix, labels, title="Semanti
             ax.add_patch(rect)
 
     ax.set_title(title, fontsize=14, pad=20)
-    ax.set_xlabel('Queries', fontsize=12)
-    ax.set_ylabel('Queries', fontsize=12)
 
     # Add colorbar
     sm = plt.cm.ScalarMappable(cmap=colormap, 
