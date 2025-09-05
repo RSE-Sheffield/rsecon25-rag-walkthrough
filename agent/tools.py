@@ -6,7 +6,8 @@ from langchain_core.tools import tool
 @tool
 def get_wikipedia_info(query: str) -> dict:
     """
-    Fetch information about RSECon from Wikipedia.
+    Get information from Wikipedia for a given query.
+    You should use this tool when you need to find general information about a topic.
 
     Args:
         query (str): The search query for Wikipedia.
