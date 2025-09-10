@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 def get_wikipedia_info(query: str) -> dict:
     """
     Get information from Wikipedia for a given query.
-    You should use this tool when you need to find general information about a topic.
+    You should use only this tool when you need to find general information about a topic or when all other sources fail to return.
 
     Args:
         query (str): The search query for Wikipedia.
