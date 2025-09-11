@@ -3,7 +3,7 @@ from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_core.tools import tool
 
 
-@tool
+@tool(response_format="content_and_artifact")
 def get_wikipedia_info(query: str) -> dict:
     """
     Get information from Wikipedia for a given query.
@@ -16,7 +16,8 @@ def get_wikipedia_info(query: str) -> dict:
         dict: JSON response containing Wikipedia information.
     """
     wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
-    return wikipedia.run(query)
+    results = wikipedia.run(query)
+    return results
 
 
 TOOLS = [
