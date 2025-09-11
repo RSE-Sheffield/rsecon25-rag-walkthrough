@@ -1,10 +1,11 @@
 streamlit>=1.28.0
-langchain
+langchain>=1.0.0
 langchain-community
-#langchain-openai
-#langchain-google-genai
+langchain-ollama
+langchain-chroma
+langgraph
+wikipedia
 chromadb
-sentence-transformers
 pypdf2
 python-dotenv
-bs4
+pypdf
